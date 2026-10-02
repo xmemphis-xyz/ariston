@@ -1,8 +1,6 @@
 {
   "name": "Ariston Boost",
-  "zip_release": true,
-  "hide_default_branch": true,
+  "zip_release": false,
   "render_readme": true,
-  "homeassistant": "2023.1.1",
-  "filename": "ariston_boost.zip"
+  "homeassistant": "2023.1.1"
 }
