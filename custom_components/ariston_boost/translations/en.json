@@ -14,8 +14,8 @@
         "data": {
           "password": "Password",
           "username": "Username",
-          "api_url_setting": "Ariston Boost API url",
-          "api_user_agent": "Ariston Boost API user agent"
+          "api_url_setting": "Ariston Nimbus API url",
+          "api_user_agent": "Ariston Nimbus API user agent"
         }
       }
     }
@@ -29,7 +29,7 @@
           "energy_scan_interval": "Energy Scan Interval (minutes)",
           "bus_errors_scan_interval": "Bus Errors Scan Interval (seconds)"
         },
-        "title": "Configure Ariston Boost"
+        "title": "Configure Ariston Nimbus"
       }
     }
   }
