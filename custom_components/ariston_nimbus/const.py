@@ -280,6 +280,16 @@ ARISTON_SENSOR_TYPES: list[AristonSensorEntityDescription] = [
         system_types=[SystemType.GALEVO],
     ),
     AristonSensorEntityDescription(
+        key=DeviceProperties.DHW_TEMP,
+        name=f"{NAME} DHW set temperature",
+        icon="mdi:thermometer",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        get_native_value=lambda entity: entity.device.water_heater_target_temperature,
+        get_native_unit_of_measurement=lambda entity: entity.device.water_heater_temperature_unit,
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonSensorEntityDescription(
         key=str(MenuItemNames.SIGNAL_STRENGTH),
         name=f"{NAME} signal strength",
         state_class=SensorStateClass.MEASUREMENT,
