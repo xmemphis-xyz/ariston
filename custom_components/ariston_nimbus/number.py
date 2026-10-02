@@ -35,7 +35,11 @@ async def async_setup_entry(
             )
         ):
             if description.zone:
-                for zone_number in coordinator.device.zone_numbers:
+                zone_numbers = coordinator.device.zone_numbers
+                if description.max_zones is not None:
+                    zone_numbers = zone_numbers[: description.max_zones]
+
+                for zone_number in zone_numbers:
                     ariston_numbers.append(
                         AristonNumber(
                             coordinator,
