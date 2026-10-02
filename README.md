@@ -2,7 +2,7 @@
 
 Temporary fork of the Ariston Home Assistant integration with GALEVO/Nimbus DHW Boost support.
 
-This integration uses the `ariston_boost` domain so it can run alongside the original `ariston` integration.
+This integration uses the `ariston_nimbus` domain so it can run alongside the original `ariston` integration.
 
 ## Nimbus / GALEVO
 
