@@ -6,7 +6,7 @@ from collections.abc import Callable
 from datetime import timedelta
 import logging
 
-from ariston.base_device import AristonBaseDevice
+from .ariston_nimbus_api.base_device import AristonBaseDevice
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
