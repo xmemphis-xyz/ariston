@@ -1,6 +1,6 @@
 {
   "domain": "ariston_boost",
-  "name": "Ariston Boost",
+  "name": "Ariston Nimbus",
   "codeowners": ["@fustom"],
   "config_flow": true,
   "dependencies": [],
