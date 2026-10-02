@@ -6,7 +6,7 @@ create_vacation:
   fields:
     device_id:
       name: Device
-      description: Ariston Boost device on which to create the vacation.
+      description: Ariston device on which to create the vacation.
       required: true
       selector:
         device:
@@ -18,18 +18,18 @@ create_vacation:
         text:
 set_item_by_id:
   name: Set item by id
-  description: Ariston Boost device or thermostat property
+  description: Ariston device or thermostat property
   fields:
     device_id:
       name: Device
-      description: Ariston Boost device on which to set item.
+      description: Ariston device on which to set item.
       required: true
       selector:
         device:
           integration: ariston
     item_id:
       name: Device or thermostat property
-      description: Ariston Boost device or thermostat property
+      description: Ariston device or thermostat property
       required: true
       selector:
         select:
