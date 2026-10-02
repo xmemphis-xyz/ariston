@@ -1035,6 +1035,19 @@ class AristonAPI:
                         )
                     case _ if response.status >= 500:
                         if retry_count >= self.__max_retries:
+                            try:
+                                content = await response.text()
+                            except Exception:
+                                content = "<unable to read response body>"
+                            _LOGGER.error(
+                                "Ariston cloud returned HTTP %s after %s retries. "
+                                "Method: %s, path: %s, response body: %s",
+                                response.status,
+                                retry_count,
+                                method,
+                                path,
+                                content[:2000],
+                            )
                             raise ConnectionException(response.status)
                         wait_seconds = self.__backoff_seconds(retry_count)
                         _LOGGER.warning(
