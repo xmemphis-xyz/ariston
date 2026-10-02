@@ -13,10 +13,8 @@
   "loggers": [
     "ariston"
   ],
-  "requirements": [
-    "ariston @ git+https://github.com/gatisvil/python-ariston-api.git@9eb3323f1e3a341a042b852b40ca2fb44e3a827f"
-  ],
+  "requirements": [],
   "ssdp": [],
-  "version": "0.1.0",
+  "version": "0.1.1",
   "zeroconf": []
 }
