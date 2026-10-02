@@ -2,12 +2,10 @@
 
 from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
-import sys
 from typing import Any, Final
 
 from .ariston_nimbus_api.const import (
     ARISTON_BUS_ERRORS,
-    ConsumptionProperties,
     ConsumptionType,
     CustomDeviceFeatures,
     DeviceAttribute,
@@ -328,66 +326,6 @@ ARISTON_SENSOR_TYPES: list[AristonSensorEntityDescription] = [
         ],
     ),
     AristonSensorEntityDescription(
-        key="Gas consumption for heating last month",
-        name=f"{NAME} gas consumption for heating last month",
-        icon="mdi:cash",
-        entity_category=EntityCategory.DIAGNOSTIC,
-        device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        device_features=[DeviceFeatures.HAS_METERING],
-        coordinator=ENERGY_COORDINATOR,
-        get_native_value=lambda entity: entity.device.gas_consumption_for_heating_last_month,
-        system_types=[SystemType.GALEVO],
-    ),
-    AristonSensorEntityDescription(
-        key="Electricity consumption for heating last month",
-        name=f"{NAME} electricity consumption for heating last month",
-        icon="mdi:cash",
-        entity_category=EntityCategory.DIAGNOSTIC,
-        device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        device_features=[DeviceFeatures.HAS_METERING],
-        coordinator=ENERGY_COORDINATOR,
-        get_native_value=lambda entity: entity.device.electricity_consumption_for_heating_last_month,
-        system_types=[SystemType.GALEVO],
-    ),
-    AristonSensorEntityDescription(
-        key="Electricity consumption for cooling last month",
-        name=f"{NAME} electricity consumption for cooling last month",
-        icon="mdi:cash",
-        entity_category=EntityCategory.DIAGNOSTIC,
-        device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        device_features=[DeviceFeatures.HAS_METERING, DeviceAttribute.HPMP_SYS],
-        coordinator=ENERGY_COORDINATOR,
-        get_native_value=lambda entity: entity.device.electricity_consumption_for_cooling_last_month,
-        system_types=[SystemType.GALEVO],
-    ),
-    AristonSensorEntityDescription(
-        key="Gas consumption for water last month",
-        name=f"{NAME} gas consumption for water last month",
-        icon="mdi:cash",
-        entity_category=EntityCategory.DIAGNOSTIC,
-        device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        device_features=[DeviceFeatures.HAS_METERING, CustomDeviceFeatures.HAS_DHW],
-        coordinator=ENERGY_COORDINATOR,
-        get_native_value=lambda entity: entity.device.gas_consumption_for_water_last_month,
-        system_types=[SystemType.GALEVO],
-    ),
-    AristonSensorEntityDescription(
-        key="Electricity consumption for water last month",
-        name=f"{NAME} electricity consumption for water last month",
-        icon="mdi:cash",
-        entity_category=EntityCategory.DIAGNOSTIC,
-        device_class=SensorDeviceClass.ENERGY,
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        device_features=[DeviceFeatures.HAS_METERING, CustomDeviceFeatures.HAS_DHW],
-        coordinator=ENERGY_COORDINATOR,
-        get_native_value=lambda entity: entity.device.electricity_consumption_for_water_last_month,
-        system_types=[SystemType.GALEVO],
-    ),
-    AristonSensorEntityDescription(
         key="Central heating total energy consumption",
         name=f"{NAME} central heating total energy consumption",
         icon="mdi:cash",
@@ -516,32 +454,6 @@ ARISTON_SENSOR_TYPES: list[AristonSensorEntityDescription] = [
         get_last_reset=lambda entity: entity.device.consumption_sequence_last_changed_utc,
     ),
     AristonSensorEntityDescription(
-        key=EvoDeviceProperties.RM_TM,
-        name=f"{NAME} remaining time",
-        icon="mdi:timer",
-        state_class=SensorStateClass.MEASUREMENT,
-        get_native_value=lambda entity: entity.device.rm_tm_in_minutes,
-        native_unit_of_measurement=UnitOfTime.MINUTES,
-        system_types=[SystemType.VELIS],
-        whe_types=[
-            WheType.Lux,
-            WheType.Evo,
-            WheType.Evo2,
-            WheType.Lux2,
-            WheType.Lydos,
-        ],
-    ),
-    AristonSensorEntityDescription(
-        key=SlpDeviceSettings.SLP_HEATING_RATE,
-        name=f"{NAME} heating rate",
-        icon="mdi:chart-line",
-        state_class=SensorStateClass.MEASUREMENT,
-        get_native_value=lambda entity: entity.device.water_heater_heating_rate,
-        native_unit_of_measurement="",
-        system_types=[SystemType.VELIS],
-        whe_types=[WheType.NuosSplit],
-    ),
-    AristonSensorEntityDescription(
         key=ARISTON_BUS_ERRORS,
         name=f"{NAME} errors count",
         icon="mdi:alert-outline",
@@ -569,35 +481,6 @@ ARISTON_SENSOR_TYPES: list[AristonSensorEntityDescription] = [
         whe_types=[
             WheType.Evo,
         ],
-    ),
-    AristonSensorEntityDescription(
-        key=VelisDeviceProperties.PROC_REQ_TEMP,
-        name=f"{NAME} proc req temp",
-        icon="mdi:thermometer-auto",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        get_native_value=lambda entity: entity.device.proc_req_temp_value,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        system_types=[SystemType.VELIS],
-        whe_types=[
-            WheType.NuosSplit,
-            WheType.Evo2,
-            WheType.LydosHybrid,
-            WheType.Lydos,
-            WheType.Andris2,
-            WheType.Lux,
-            WheType.Lux2,
-        ],
-    ),
-]
-
-ARISTON_BINARY_SENSOR_TYPES: list[AristonBinarySensorEntityDescription] = [
-    AristonBinarySensorEntityDescription(
-        key=DeviceProperties.IS_FLAME_ON,
-        name=f"{NAME} is flame on",
-        icon="mdi:fire",
-        get_is_on=lambda entity: entity.device.is_flame_on_value,
-        system_types=[SystemType.GALEVO, SystemType.BSB],
     ),
     AristonBinarySensorEntityDescription(
         key=DeviceProperties.IS_HEATING_PUMP_ON,
@@ -852,22 +735,6 @@ ARISTON_NUMBER_TYPES: list[AristonNumberEntityDescription] = [
         system_types=[SystemType.GALEVO],
     ),
     AristonNumberEntityDescription(
-        key=ConsumptionProperties.ELEC_COST,
-        name=f"{NAME} elec cost",
-        icon="mdi:currency-sign",
-        entity_category=EntityCategory.CONFIG,
-        native_min_value=0,
-        native_max_value=sys.maxsize,
-        native_step=0.01,
-        device_features=[DeviceFeatures.HAS_METERING],
-        coordinator=ENERGY_COORDINATOR,
-        get_native_value=lambda entity: entity.device.elect_cost,
-        set_native_value=lambda entity, value: entity.device.async_set_elect_cost(
-            value
-        ),
-        system_types=[SystemType.GALEVO],
-    ),
-    AristonNumberEntityDescription(
         key=MedDeviceSettings.MED_MAX_SETPOINT_TEMPERATURE,
         name=f"{NAME} max setpoint temperature",
         icon="mdi:thermometer-high",
@@ -990,33 +857,6 @@ ARISTON_NUMBER_TYPES: list[AristonNumberEntityDescription] = [
 ]
 
 ARISTON_SELECT_TYPES: list[AristonSelectEntityDescription] = [
-    AristonSelectEntityDescription(
-        key=ConsumptionProperties.CURRENCY,
-        name=f"{NAME} currency",
-        icon="mdi:cash-100",
-        device_class=SensorDeviceClass.MONETARY,
-        entity_category=EntityCategory.CONFIG,
-        device_features=[DeviceFeatures.HAS_METERING],
-        coordinator=ENERGY_COORDINATOR,
-        get_current_option=lambda entity: entity.device.currency,
-        get_options=lambda entity: entity.device.get_currencies(),
-        select_option=lambda entity, option: entity.device.async_set_currency(option),
-        system_types=[SystemType.GALEVO],
-    ),
-    AristonSelectEntityDescription(
-        key=ConsumptionProperties.GAS_ENERGY_UNIT,
-        name=f"{NAME} gas energy unit",
-        icon="mdi:cube-scan",
-        entity_category=EntityCategory.CONFIG,
-        device_features=[DeviceFeatures.HAS_METERING],
-        coordinator=ENERGY_COORDINATOR,
-        get_current_option=lambda entity: entity.device.gas_energy_unit,
-        get_options=lambda entity: entity.device.get_gas_energy_units(),
-        select_option=lambda entity, option: entity.device.async_set_gas_energy_unit(
-            option
-        ),
-        system_types=[SystemType.GALEVO],
-    ),
     AristonSelectEntityDescription(
         key=DeviceProperties.HYBRID_MODE,
         name=f"{NAME} hybrid mode",
