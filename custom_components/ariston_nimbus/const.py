@@ -131,6 +131,7 @@ class AristonNumberEntityDescription(
     get_native_min_value: Callable[[Any], float] | None = None
     get_native_max_value: Callable[[Any], float | None] | None = None
     get_native_step: Callable[[Any], Coroutine] | None = None
+    max_zones: int | None = None
 
 
 @dataclass(kw_only=True, frozen=True)
@@ -867,20 +868,6 @@ ARISTON_NUMBER_TYPES: list[AristonNumberEntityDescription] = [
         system_types=[SystemType.GALEVO],
     ),
     AristonNumberEntityDescription(
-        key=ConsumptionProperties.GAS_COST,
-        name=f"{NAME} gas cost",
-        icon="mdi:currency-sign",
-        entity_category=EntityCategory.CONFIG,
-        native_min_value=0,
-        native_max_value=sys.maxsize,
-        native_step=0.01,
-        device_features=[DeviceFeatures.HAS_METERING],
-        coordinator=ENERGY_COORDINATOR,
-        get_native_value=lambda entity: entity.device.gas_cost,
-        set_native_value=lambda entity, value: entity.device.async_set_gas_cost(value),
-        system_types=[SystemType.GALEVO],
-    ),
-    AristonNumberEntityDescription(
         key=MedDeviceSettings.MED_MAX_SETPOINT_TEMPERATURE,
         name=f"{NAME} max setpoint temperature",
         icon="mdi:thermometer-high",
@@ -958,6 +945,7 @@ ARISTON_NUMBER_TYPES: list[AristonNumberEntityDescription] = [
         icon="mdi:progress-wrench",
         entity_category=EntityCategory.CONFIG,
         zone=True,
+        max_zones=1,
         get_native_min_value=lambda entity: entity.device.get_heating_flow_offset_min(
             entity.zone
         ),
@@ -1013,18 +1001,6 @@ ARISTON_SELECT_TYPES: list[AristonSelectEntityDescription] = [
         get_current_option=lambda entity: entity.device.currency,
         get_options=lambda entity: entity.device.get_currencies(),
         select_option=lambda entity, option: entity.device.async_set_currency(option),
-        system_types=[SystemType.GALEVO],
-    ),
-    AristonSelectEntityDescription(
-        key=ConsumptionProperties.GAS_TYPE,
-        name=f"{NAME} gas type",
-        icon="mdi:gas-cylinder",
-        entity_category=EntityCategory.CONFIG,
-        device_features=[DeviceFeatures.HAS_METERING],
-        coordinator=ENERGY_COORDINATOR,
-        get_current_option=lambda entity: entity.device.gas_type,
-        get_options=lambda entity: entity.device.get_gas_types(),
-        select_option=lambda entity, option: entity.device.async_set_gas_type(option),
         system_types=[SystemType.GALEVO],
     ),
     AristonSelectEntityDescription(
