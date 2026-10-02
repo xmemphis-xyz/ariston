@@ -1,4 +1,4 @@
-# Ariston Boost
+# Ariston Nimbus
 
 Temporary fork of the Ariston Home Assistant integration with GALEVO/Nimbus DHW Boost support.
 
