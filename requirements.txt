@@ -1,2 +1,1 @@
-ariston @ git+https://github.com/gatisvil/python-ariston-api.git@9eb3323f1e3a341a042b852b40ca2fb44e3a827f
 homeassistant>=2023.1.0
