@@ -7,8 +7,8 @@ from typing import Any
 
 import voluptuous as vol
 
-from ariston import Ariston, DeviceAttribute
-from ariston.const import ARISTON_API_URL, ARISTON_USER_AGENT
+from .ariston_nimbus_api import Ariston, DeviceAttribute
+from .ariston_nimbus_api.const import ARISTON_API_URL, ARISTON_USER_AGENT
 from homeassistant import config_entries
 from homeassistant.const import (
     CONF_DEVICE,
