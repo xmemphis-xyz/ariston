@@ -6,8 +6,8 @@ import logging
 
 import voluptuous as vol
 
-from ariston import Ariston, DeviceAttribute, SystemType
-from ariston.const import ARISTON_API_URL, ARISTON_USER_AGENT
+from .ariston_nimbus_api import Ariston, DeviceAttribute, SystemType
+from .ariston_nimbus_api.const import ARISTON_API_URL, ARISTON_USER_AGENT
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_DEVICE_ID,
