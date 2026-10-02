@@ -1,0 +1,16 @@
+{
+  "domain": "ariston_nimbus",
+  "name": "Ariston Nimbus",
+  "codeowners": ["@fustom"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/xmemphis-xyz/ariston",
+  "homekit": {},
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/xmemphis-xyz/ariston/issues",
+  "loggers": ["ariston"],
+  "requirements": ["ariston @ git+https://github.com/gatisvil/python-ariston-api.git@9eb3323f1e3a341a042b852b40ca2fb44e3a827f"],
+  "ssdp": [],
+  "version": "0.1.0",
+  "zeroconf": []
+}
