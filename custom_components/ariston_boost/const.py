@@ -50,7 +50,7 @@ except ImportError:
 import datetime as dt
 
 DOMAIN: Final[str] = "ariston_boost"
-NAME: Final[str] = "Ariston Boost"
+NAME: Final[str] = "Ariston Nimbus"
 COORDINATOR: Final[str] = "coordinator"
 ENERGY_COORDINATOR: Final[str] = "energy_coordinator"
 ENERGY_SCAN_INTERVAL: Final[str] = "energy_scan_interval"
