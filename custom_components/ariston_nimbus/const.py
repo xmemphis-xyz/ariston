@@ -450,6 +450,7 @@ ARISTON_SENSOR_TYPES: list[AristonSensorEntityDescription] = [
             WheType.Evo,
         ],
     ),
+ARISTON_BINARY_SENSOR_TYPES: list[AristonBinarySensorEntityDescription] = [
     AristonBinarySensorEntityDescription(
         key=DeviceProperties.IS_HEATING_PUMP_ON,
         name=f"{NAME} is heating pump on",
