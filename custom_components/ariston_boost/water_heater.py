@@ -1,4 +1,4 @@
-"""Support for Ariston Boost water heaters."""
+"""Support for Ariston water heaters."""
 
 from __future__ import annotations
 
@@ -16,10 +16,10 @@ from homeassistant.core import HomeAssistant
 from .const import (
     ARISTON_WATER_HEATER_TYPES,
     DOMAIN,
-    Ariston BoostWaterHeaterEntityDescription,
+    AristonWaterHeaterEntityDescription,
 )
 from .coordinator import DeviceDataUpdateCoordinator
-from .entity import Ariston BoostEntity
+from .entity import AristonEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,8 +27,8 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities
 ):
-    """Set up the Ariston Boost water heater device from config entry."""
-    ariston_water_heaters: list[Ariston BoostWaterHeater] = []
+    """Set up the Ariston water heater device from config entry."""
+    ariston_water_heaters: list[AristonWaterHeater] = []
     for description in ARISTON_WATER_HEATER_TYPES:
         coordinator: DeviceDataUpdateCoordinator = hass.data[DOMAIN][entry.unique_id][
             description.coordinator
@@ -43,18 +43,18 @@ async def async_setup_entry(
                 description.whe_types,
             )
         ):
-            ariston_water_heaters.append(Ariston BoostWaterHeater(coordinator, description))
+            ariston_water_heaters.append(AristonWaterHeater(coordinator, description))
 
     async_add_entities(ariston_water_heaters)
 
 
-class Ariston BoostWaterHeater(Ariston BoostEntity, WaterHeaterEntity):
-    """Ariston Boost Water Heater Device."""
+class AristonWaterHeater(AristonEntity, WaterHeaterEntity):
+    """Ariston Water Heater Device."""
 
     def __init__(
         self,
         coordinator: DeviceDataUpdateCoordinator,
-        description: Ariston BoostWaterHeaterEntityDescription,
+        description: AristonWaterHeaterEntityDescription,
     ) -> None:
         """Initialize the water heater."""
         super().__init__(coordinator, description)
