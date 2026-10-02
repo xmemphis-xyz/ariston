@@ -1,4 +1,4 @@
-"""Support for Ariston Boost sensors."""
+"""Support for Ariston sensors."""
 
 from __future__ import annotations
 
@@ -8,9 +8,9 @@ from homeassistant.components.number import NumberEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import ARISTON_NUMBER_TYPES, DOMAIN, Ariston BoostNumberEntityDescription
+from .const import ARISTON_NUMBER_TYPES, DOMAIN, AristonNumberEntityDescription
 from .coordinator import DeviceDataUpdateCoordinator
-from .entity import Ariston BoostEntity
+from .entity import AristonEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,8 +18,8 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities
 ) -> None:
-    """Set up the Ariston Boost binary sensors from config entry."""
-    ariston_numbers: list[Ariston BoostNumber] = []
+    """Set up the Ariston binary sensors from config entry."""
+    ariston_numbers: list[AristonNumber] = []
 
     for description in ARISTON_NUMBER_TYPES:
         coordinator: DeviceDataUpdateCoordinator = hass.data[DOMAIN][entry.unique_id][
@@ -37,25 +37,25 @@ async def async_setup_entry(
             if description.zone:
                 for zone_number in coordinator.device.zone_numbers:
                     ariston_numbers.append(
-                        Ariston BoostNumber(
+                        AristonNumber(
                             coordinator,
                             description,
                             zone_number,
                         )
                     )
             else:
-                ariston_numbers.append(Ariston BoostNumber(coordinator, description))
+                ariston_numbers.append(AristonNumber(coordinator, description))
 
     async_add_entities(ariston_numbers)
 
 
-class Ariston BoostNumber(Ariston BoostEntity, NumberEntity):
+class AristonNumber(AristonEntity, NumberEntity):
     """Base class for specific ariston binary sensors."""
 
     def __init__(
         self,
         coordinator: DeviceDataUpdateCoordinator,
-        description: Ariston BoostNumberEntityDescription,
+        description: AristonNumberEntityDescription,
         zone: int = 0,
     ) -> None:
         """Initialize the entity."""
