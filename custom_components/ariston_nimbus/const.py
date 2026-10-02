@@ -676,16 +676,6 @@ ARISTON_SWITCH_TYPES: list[AristonSwitchEntityDescription] = [
         system_types=[SystemType.GALEVO],
     ),
     AristonSwitchEntityDescription(
-        key=DeviceProperties.AUTOMATIC_THERMOREGULATION,
-        name=f"{NAME} automatic thermoregulation",
-        icon="mdi:radiator",
-        device_features=[DeviceFeatures.AUTO_THERMO_REG],
-        set_value=lambda entity,
-        value: entity.device.async_set_automatic_thermoregulation(value),
-        get_is_on=lambda entity: entity.device.automatic_thermoregulation,
-        system_types=[SystemType.GALEVO],
-    ),
-    AristonSwitchEntityDescription(
         key=DeviceProperties.IS_QUIET,
         name=f"{NAME} is quiet",
         icon="mdi:volume-off",
