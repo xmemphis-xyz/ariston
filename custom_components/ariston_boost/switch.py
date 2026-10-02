@@ -1,4 +1,4 @@
-"""Support for Ariston Boost switches."""
+"""Support for Ariston switches."""
 
 from __future__ import annotations
 
@@ -8,9 +8,9 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import ARISTON_SWITCH_TYPES, DOMAIN, Ariston BoostSwitchEntityDescription
+from .const import ARISTON_SWITCH_TYPES, DOMAIN, AristonSwitchEntityDescription
 from .coordinator import DeviceDataUpdateCoordinator
-from .entity import Ariston BoostEntity
+from .entity import AristonEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,8 +18,8 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities
 ) -> None:
-    """Set up the Ariston Boost switches from config entry."""
-    ariston_switches: list[Ariston BoostSwitch] = []
+    """Set up the Ariston switches from config entry."""
+    ariston_switches: list[AristonSwitch] = []
     for description in ARISTON_SWITCH_TYPES:
         coordinator: DeviceDataUpdateCoordinator = hass.data[DOMAIN][entry.unique_id][
             description.coordinator
@@ -34,7 +34,7 @@ async def async_setup_entry(
             )
         ):
             ariston_switches.append(
-                Ariston BoostSwitch(
+                AristonSwitch(
                     coordinator,
                     description,
                 )
@@ -43,13 +43,13 @@ async def async_setup_entry(
     async_add_entities(ariston_switches)
 
 
-class Ariston BoostSwitch(Ariston BoostEntity, SwitchEntity):
+class AristonSwitch(AristonEntity, SwitchEntity):
     """Base class for specific ariston switches."""
 
     def __init__(
         self,
         coordinator: DeviceDataUpdateCoordinator,
-        description: Ariston BoostSwitchEntityDescription,
+        description: AristonSwitchEntityDescription,
     ) -> None:
         """Initialize the switch."""
         super().__init__(coordinator, description)
