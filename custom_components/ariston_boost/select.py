@@ -1,4 +1,4 @@
-"""Support for Ariston Boost sensors."""
+"""Support for Ariston sensors."""
 
 from __future__ import annotations
 
@@ -8,9 +8,9 @@ from homeassistant.components.select import SelectEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import ARISTON_SELECT_TYPES, DOMAIN, Ariston BoostSelectEntityDescription
+from .const import ARISTON_SELECT_TYPES, DOMAIN, AristonSelectEntityDescription
 from .coordinator import DeviceDataUpdateCoordinator
-from .entity import Ariston BoostEntity
+from .entity import AristonEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,8 +18,8 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities
 ) -> None:
-    """Set up the Ariston Boost binary sensors from config entry."""
-    ariston_select: list[Ariston BoostSelect] = []
+    """Set up the Ariston binary sensors from config entry."""
+    ariston_select: list[AristonSelect] = []
 
     for description in ARISTON_SELECT_TYPES:
         coordinator: DeviceDataUpdateCoordinator = hass.data[DOMAIN][entry.unique_id][
@@ -35,7 +35,7 @@ async def async_setup_entry(
             )
         ):
             ariston_select.append(
-                Ariston BoostSelect(
+                AristonSelect(
                     coordinator,
                     description,
                 )
@@ -44,13 +44,13 @@ async def async_setup_entry(
     async_add_entities(ariston_select)
 
 
-class Ariston BoostSelect(Ariston BoostEntity, SelectEntity):
+class AristonSelect(AristonEntity, SelectEntity):
     """Base class for specific ariston binary sensors."""
 
     def __init__(
         self,
         coordinator: DeviceDataUpdateCoordinator,
-        description: Ariston BoostSelectEntityDescription,
+        description: AristonSelectEntityDescription,
     ) -> None:
         """Initialize the entity."""
         super().__init__(coordinator, description)
