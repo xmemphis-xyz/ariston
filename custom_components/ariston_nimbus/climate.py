@@ -41,7 +41,9 @@ async def async_setup_entry(
                 description.whe_types,
             )
         ):
-            for zone_number in coordinator.device.zone_numbers:
+            # Nimbus exposes several heating zones, but for this integration
+            # one climate entity is sufficient. Use the first available zone.
+            for zone_number in coordinator.device.zone_numbers[:1]:
                 ariston_climates.append(
                     AristonThermostat(
                         zone_number,
@@ -99,7 +101,7 @@ class AristonThermostat(AristonEntity, ClimateEntity):
 
     @property
     def max_temp(self):
-        """Return the maximum temperature."""
+        """Return maximum temperature."""
         return self.device.get_comfort_temp_max(self.zone)
 
     @property
@@ -168,7 +170,9 @@ class AristonThermostat(AristonEntity, ClimateEntity):
     def hvac_action(self):
         """Return the current running hvac operation."""
         if_flame_on = bool(self.device.is_flame_on_value)
-        if_heating_pump_on = bool(getattr(self.device, 'is_heating_pump_on_value', False))
+        if_heating_pump_on = bool(
+            getattr(self.device, "is_heating_pump_on_value", False)
+        )
 
         if_not_idle = if_flame_on or if_heating_pump_on
 
@@ -213,12 +217,9 @@ class AristonThermostat(AristonEntity, ClimateEntity):
                     PlantMode.HEATING_ONLY,
                     PlantMode.COOLING,
                 ]:
-                    # if already heating or cooling just change CH mode
                     pass
                 elif current_plant_mode == PlantMode.SUMMER:
-                    # DHW is working, so use Winter where CH and DHW are active
                     await self.device.async_set_plant_mode(PlantMode.WINTER)
-                # hvac is OFF, so use heating only, if not supported then winter
                 elif PlantMode.HEATING_ONLY in plant_modes:
                     await self.device.async_set_plant_mode(PlantMode.HEATING_ONLY)
                 else:
@@ -226,12 +227,9 @@ class AristonThermostat(AristonEntity, ClimateEntity):
                 await self.device.async_set_zone_mode(ZoneMode.TIME_PROGRAM, self.zone)
             elif hvac_mode == HVACMode.HEAT:
                 if current_plant_mode in [PlantMode.WINTER, PlantMode.HEATING_ONLY]:
-                    # if already heating, change CH mode
                     pass
                 elif current_plant_mode in [PlantMode.SUMMER, PlantMode.COOLING]:
-                    # DHW is working, so use Winter and change mode
                     await self.device.async_set_plant_mode(PlantMode.WINTER)
-                # hvac is OFF, so use heating only, if not supported then winter
                 elif PlantMode.HEATING_ONLY in plant_modes:
                     await self.device.async_set_plant_mode(PlantMode.HEATING_ONLY)
                 else:
@@ -250,7 +248,6 @@ class AristonThermostat(AristonEntity, ClimateEntity):
                     )
                 else:
                     await self.device.async_set_zone_mode(ZoneMode.MANUAL, self.zone)
-        # Plant mode is not supported (BSB device)
         elif hvac_mode == HVACMode.OFF:
             await self.device.async_set_zone_mode(BsbZoneMode.OFF, self.zone)
         elif hvac_mode == HVACMode.AUTO:
@@ -268,29 +265,22 @@ class AristonThermostat(AristonEntity, ClimateEntity):
             self.name,
         )
 
-        # Don't assume index maps to enum value directly
         preset_index = self.device.plant_mode_opt_texts.index(preset_mode)
         plant_mode = PlantMode(self.device.plant_mode_options[preset_index])
 
-        # Get current states
         current_plant_in_cool = self.device.is_plant_in_cool_mode
         zone_modes = self.device.get_zone_mode_options(self.zone)
 
-        # When switching away from cooling mode, ensure zone is in appropriate state
         if current_plant_in_cool and plant_mode != PlantMode.COOLING:
-            # Set zone to manual heat mode before changing plant mode
             if ZoneMode.MANUAL in zone_modes:
                 await self.device.async_set_zone_mode(ZoneMode.MANUAL, self.zone)
 
-        # Set the plant mode
         await self.device.async_set_plant_mode(plant_mode)
 
-        # Special handling for OFF mode
         if plant_mode == PlantMode.OFF:
             if self.device.is_zone_mode_options_contains_off(self.zone):
                 await self.device.async_set_zone_mode(BsbZoneMode.OFF, self.zone)
 
-        # Refresh coordinator to get updated device state
         await self.coordinator.async_request_refresh()
         self.async_write_ha_state()
 
@@ -300,6 +290,7 @@ class AristonThermostat(AristonEntity, ClimateEntity):
             raise ValueError(f"Missing parameter {ATTR_TEMPERATURE}")
 
         temperature = kwargs[ATTR_TEMPERATURE]
+
         _LOGGER.debug(
             "Setting temperature to %s for %s",
             temperature,
