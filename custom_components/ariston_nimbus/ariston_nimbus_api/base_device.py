@@ -204,6 +204,22 @@ class AristonBaseDevice(ABC):
         )
 
     @property
+    def central_heating_energy_today(self) -> float | None:
+        """Return central-heating energy used since midnight."""
+        return self._get_consumption_sequence_sum(
+            ConsumptionType.CENTRAL_HEATING_TOTAL_ENERGY,
+            ConsumptionTimeInterval.LAST_DAY,
+        )
+
+    @property
+    def domestic_hot_water_energy_today(self) -> float | None:
+        """Return domestic-hot-water energy used since midnight."""
+        return self._get_consumption_sequence_sum(
+            ConsumptionType.DOMESTIC_HOT_WATER_TOTAL_ENERGY,
+            ConsumptionTimeInterval.LAST_DAY,
+        )
+
+    @property
     def central_heating_gas_consumption(self) -> Any:
         """Get central heating gas consumption"""
         return self._get_consumption_sequence_last_value(
@@ -260,6 +276,30 @@ class AristonBaseDevice(ABC):
         for sequence in self.consumptions_sequences:
             if sequence["k"] == consumption_type.value and sequence["p"] == time_interval.value:
                 return sequence["v"][-1]
+
+        return None
+
+    def _get_consumption_sequence_sum(
+        self,
+        consumption_type: ConsumptionType,
+        time_interval: ConsumptionTimeInterval,
+    ) -> float | None:
+        """Sum the energy readings for a time interval (not just its last hour)."""
+        for sequence in self.consumptions_sequences:
+            if (
+                sequence.get("k") == consumption_type.value
+                and sequence.get("p") == time_interval.value
+            ):
+                readings = sequence.get("v")
+                if not isinstance(readings, list):
+                    return None
+
+                valid_readings = [
+                    value
+                    for value in readings
+                    if isinstance(value, (int, float)) and not isinstance(value, bool)
+                ]
+                return round(sum(valid_readings), 3) if valid_readings else None
 
         return None
 

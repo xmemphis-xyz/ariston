@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.10
+
+- Add separate heating and hot-water daily energy totals from the API's hourly consumption sequences.
+- Expose the new daily sensors as kWh `total_increasing` energy entities for Home Assistant statistics.
+- Preserve the existing period-reading energy sensors without changing their values or entity IDs.
+
 ## 0.1.9
 
 - Prevent HTTP 500 responses from the optional `busErrors` endpoint from blocking all Ariston Nimbus entities during setup.
