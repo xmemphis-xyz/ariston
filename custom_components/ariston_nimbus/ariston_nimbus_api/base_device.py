@@ -18,6 +18,7 @@ from .const import (
     VelisDeviceAttribute,
     WheType,
 )
+from .energy import sum_completed_two_hour_periods
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -203,20 +204,18 @@ class AristonBaseDevice(ABC):
             ConsumptionTimeInterval.LAST_DAY,
         )
 
-    @property
-    def central_heating_energy_today(self) -> float | None:
-        """Return central-heating energy used since midnight."""
-        return self._get_consumption_sequence_sum(
+    def central_heating_energy_today(self, local_hour: int) -> float | None:
+        """Return central-heating energy since local midnight."""
+        return self._get_consumption_sequence_today_sum(
             ConsumptionType.CENTRAL_HEATING_TOTAL_ENERGY,
-            ConsumptionTimeInterval.LAST_DAY,
+            local_hour,
         )
 
-    @property
-    def domestic_hot_water_energy_today(self) -> float | None:
-        """Return domestic-hot-water energy used since midnight."""
-        return self._get_consumption_sequence_sum(
+    def domestic_hot_water_energy_today(self, local_hour: int) -> float | None:
+        """Return domestic-hot-water energy since local midnight."""
+        return self._get_consumption_sequence_today_sum(
             ConsumptionType.DOMESTIC_HOT_WATER_TOTAL_ENERGY,
-            ConsumptionTimeInterval.LAST_DAY,
+            local_hour,
         )
 
     @property
@@ -279,27 +278,18 @@ class AristonBaseDevice(ABC):
 
         return None
 
-    def _get_consumption_sequence_sum(
+    def _get_consumption_sequence_today_sum(
         self,
         consumption_type: ConsumptionType,
-        time_interval: ConsumptionTimeInterval,
+        local_hour: int,
     ) -> float | None:
-        """Sum the energy readings for a time interval (not just its last hour)."""
+        """Extract today's completed two-hour readings from a rolling series."""
         for sequence in self.consumptions_sequences:
             if (
                 sequence.get("k") == consumption_type.value
-                and sequence.get("p") == time_interval.value
+                and sequence.get("p") == ConsumptionTimeInterval.LAST_DAY.value
             ):
-                readings = sequence.get("v")
-                if not isinstance(readings, list):
-                    return None
-
-                valid_readings = [
-                    value
-                    for value in readings
-                    if isinstance(value, (int, float)) and not isinstance(value, bool)
-                ]
-                return round(sum(valid_readings), 3) if valid_readings else None
+                return sum_completed_two_hour_periods(sequence.get("v"), local_hour)
 
         return None
 

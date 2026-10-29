@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.11
+
+- Fix the daily heating and hot-water energy totals: the 24 readings in Ariston's
+  `p=1` report are rolling two-hour periods, not 24 readings for the current day.
+- Sum only completed two-hour periods since local midnight (Home Assistant time
+  zone), excluding energy from previous days and the unfinished period.
+- Preserve the existing energy sensor entity IDs and all other Ariston entities.
+
 ## 0.1.10
 
 - Add separate heating and hot-water daily energy totals from the API's hourly consumption sequences.

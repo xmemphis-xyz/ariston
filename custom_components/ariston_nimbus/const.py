@@ -36,6 +36,7 @@ from homeassistant.components.sensor import (
 from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.const import UnitOfEnergy, UnitOfTemperature, UnitOfTime
 from homeassistant.helpers.entity import EntityCategory, EntityDescription
+from homeassistant.util import dt as dt_util
 
 try:
     from homeassistant.components.water_heater import WaterHeaterEntityDescription
@@ -357,7 +358,9 @@ ARISTON_SENSOR_TYPES: list[AristonSensorEntityDescription] = [
             ConsumptionType.CENTRAL_HEATING_TOTAL_ENERGY.name,
         ],
         coordinator=ENERGY_COORDINATOR,
-        get_native_value=lambda entity: entity.device.central_heating_energy_today,
+        get_native_value=lambda entity: entity.device.central_heating_energy_today(
+            dt_util.now().hour
+        ),
     ),
     AristonSensorEntityDescription(
         key="Domestic hot water energy today",
@@ -371,7 +374,9 @@ ARISTON_SENSOR_TYPES: list[AristonSensorEntityDescription] = [
             ConsumptionType.DOMESTIC_HOT_WATER_TOTAL_ENERGY.name,
         ],
         coordinator=ENERGY_COORDINATOR,
-        get_native_value=lambda entity: entity.device.domestic_hot_water_energy_today,
+        get_native_value=lambda entity: entity.device.domestic_hot_water_energy_today(
+            dt_util.now().hour
+        ),
     ),
     AristonSensorEntityDescription(
         key="Central heating total energy consumption",
