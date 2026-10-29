@@ -18,13 +18,28 @@ local midnight:
 - **Ariston Nimbus heating energy today** — central heating (CO)
 - **Ariston Nimbus hot water energy today** — domestic hot water (CWU)
 
-They sum the hourly readings in the Ariston API's `LAST_DAY` sequence and update
-with the energy coordinator (every 60 minutes by default). Both are in kWh with
-`total_increasing` state class and can be used for daily long-term statistics.
-The source values reset for a new day. Home Assistant only starts recording
+They sum only the completed two-hour readings from local midnight in the
+Ariston API's rolling `LAST_DAY` sequence. The API supplies up to 24 two-hour
+readings, so summing the entire sequence includes previous days. Values update
+with the energy coordinator (every 60 minutes by default), and the current,
+unfinished two-hour period is not included. Both sensors use kWh and the
+`total_increasing` state class for Home Assistant statistics. The sensors reset
+to zero on the first energy-coordinator update after local midnight.
+Home Assistant only starts recording
 long-term statistics after these sensors are added, so prior days are not
 backfilled and the first day of statistics may be partial. Availability
 depends on energy data being provided by Ariston.
+
+**Note:** Ariston reports only *completed* two-hour periods. The 22:00–24:00
+period is therefore published after midnight and cannot be included in the
+live "today" value before the date changes. For authoritative completed-day
+totals, use the historical daily readings in the Ariston app. The HA live
+sensor is best treated as the currently reported consumption since midnight,
+not a guaranteed final full-day total.
+
+If you used version 0.1.10, its daily sensors included earlier periods and
+could have produced incorrect statistics. Inspect existing Home Assistant
+statistics for those two sensors after upgrading.
 
 Existing `*total_energy_consumption` sensors remain unchanged. They expose the
 last reading in the API sequence rather than a running total and should not be
