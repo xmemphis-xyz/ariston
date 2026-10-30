@@ -57,6 +57,8 @@ BUS_ERRORS_COORDINATOR: Final[str] = "bus_errors_coordinator"
 BUS_ERRORS_SCAN_INTERVAL: Final[str] = "bus_errors_scan_interval"
 API_URL_SETTING: Final[str] = "api_url_setting"
 API_USER_AGENT: Final[str] = "api_user_agent"
+MENU_SCAN_RESULT: Final[str] = "menu_scan_result"
+MENU_SCAN_FILE: Final[str] = "ariston_nimbus_menu_scan.json"
 
 DEFAULT_SCAN_INTERVAL_SECONDS: Final[int] = 180
 DEFAULT_ENERGY_SCAN_INTERVAL_MINUTES: Final[int] = 60
@@ -84,6 +86,9 @@ class AristonBaseEntityDescription(EntityDescription):
     whe_types: list[WheType] | None = None
     zone: bool = False
     get_is_available: Callable[[Any], bool] | None = None
+    # Do not create the entity when get_is_available is False at setup,
+    # i.e. the cloud does not report this value for the device at all.
+    skip_if_unavailable: bool = False
 
 
 @dataclass(kw_only=True, frozen=True)
@@ -320,6 +325,7 @@ ARISTON_SENSOR_TYPES: list[AristonSensorEntityDescription] = [
     ),
     AristonSensorEntityDescription(
         key="ChFlowReturnDelta",
+        skip_if_unavailable=True,
         name=f"{NAME} CH flow-return delta",
         icon="mdi:thermometer-lines",
         state_class=SensorStateClass.MEASUREMENT,
@@ -333,6 +339,7 @@ ARISTON_SENSOR_TYPES: list[AristonSensorEntityDescription] = [
     ),
     AristonSensorEntityDescription(
         key=DeviceProperties.ANTILEGIONELLA_TEMP,
+        skip_if_unavailable=True,
         name=f"{NAME} anti-legionella temperature",
         icon="mdi:bacteria-outline",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -348,6 +355,7 @@ ARISTON_SENSOR_TYPES: list[AristonSensorEntityDescription] = [
     ),
     AristonSensorEntityDescription(
         key=DeviceProperties.ANTILEGIONELLA_FREQ,
+        skip_if_unavailable=True,
         name=f"{NAME} anti-legionella frequency",
         icon="mdi:calendar-refresh",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -571,6 +579,7 @@ ARISTON_BINARY_SENSOR_TYPES: list[AristonBinarySensorEntityDescription] = [
     ),
     AristonBinarySensorEntityDescription(
         key=DeviceProperties.IS_FLAME_ON,
+        skip_if_unavailable=True,
         name=f"{NAME} heat generator on",
         icon="mdi:heat-wave",
         get_is_on=lambda entity: bool(entity.device.is_flame_on_value),
@@ -579,6 +588,7 @@ ARISTON_BINARY_SENSOR_TYPES: list[AristonBinarySensorEntityDescription] = [
     ),
     AristonBinarySensorEntityDescription(
         key=ThermostatProperties.ZONE_HEAT_REQUEST,
+        skip_if_unavailable=True,
         name=f"{NAME} zone heat request",
         icon="mdi:home-thermometer",
         zone=True,
@@ -592,6 +602,7 @@ ARISTON_BINARY_SENSOR_TYPES: list[AristonBinarySensorEntityDescription] = [
     ),
     AristonBinarySensorEntityDescription(
         key=DeviceProperties.ANTILEGIONELLA_ON_OFF,
+        skip_if_unavailable=True,
         name=f"{NAME} anti-legionella enabled",
         icon="mdi:bacteria-outline",
         entity_category=EntityCategory.DIAGNOSTIC,

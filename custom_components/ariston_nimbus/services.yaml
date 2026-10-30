@@ -10,7 +10,7 @@ create_vacation:
       required: true
       selector:
         device:
-          integration: ariston
+          integration: ariston_nimbus
     end_date:
       name: End date
       description: Date the vacation ends in the YYYY-mm-dd format.
@@ -26,7 +26,7 @@ set_item_by_id:
       required: true
       selector:
         device:
-          integration: ariston
+          integration: ariston_nimbus
     item_id:
       name: Device or thermostat property
       description: Ariston device or thermostat property
@@ -61,3 +61,36 @@ set_item_by_id:
       example: "1"
       selector:
         text:
+scan_menu_items:
+  name: Scan technical menu
+  description: >-
+    Scan Ariston technical-menu items in the background to find the heat-pump
+    operating parameters your device reports. The result is shown in a
+    notification, saved to ariston_nimbus_menu_scan.json in the config folder
+    and included in Download diagnostics.
+  fields:
+    device_id:
+      name: Device
+      description: Ariston device to scan. Leave empty to scan all GALEVO devices.
+      required: false
+      selector:
+        device:
+          integration: ariston_nimbus
+    first_id:
+      name: First item id
+      description: First menu item id to scan.
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 5000
+          mode: box
+    last_id:
+      name: Last item id
+      description: Last menu item id to scan.
+      default: 500
+      selector:
+        number:
+          min: 1
+          max: 5000
+          mode: box

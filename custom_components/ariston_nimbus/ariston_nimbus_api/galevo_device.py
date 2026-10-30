@@ -30,6 +30,9 @@ from .device import AristonDevice
 
 _LOGGER = logging.getLogger(__name__)
 
+# Unknown weather codes already reported, so the log is not flooded.
+_UNKNOWN_WEATHER_CODES_LOGGED: set = set()
+
 
 class AristonGalevoDevice(AristonDevice):
     """Class representing a physical device, it's state and properties."""
@@ -368,12 +371,14 @@ class AristonGalevoDevice(AristonDevice):
             return None
         try:
             return Weather(int(raw)).name
-        except ValueError:
-            _LOGGER.warning(
-                "Unknown weather code %s from Ariston API - not yet mapped "
-                "in the Weather enum",
-                raw,
-            )
+        except (TypeError, ValueError):
+            if raw not in _UNKNOWN_WEATHER_CODES_LOGGED:
+                _UNKNOWN_WEATHER_CODES_LOGGED.add(raw)
+                _LOGGER.warning(
+                    "Unknown weather code %s from Ariston API - not yet mapped "
+                    "in the Weather enum (logged once)",
+                    raw,
+                )
             return None
 
     @property

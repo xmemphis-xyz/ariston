@@ -13,6 +13,17 @@ from .const import ARISTON_SENSOR_TYPES, DOMAIN, AristonSensorEntityDescription
 from .coordinator import DeviceDataUpdateCoordinator
 from .entity import AristonEntity
 
+
+def _should_add(entity) -> bool:
+    """Skip entities whose value the cloud never reports for this device."""
+    description = entity.entity_description
+    if not description.skip_if_unavailable or description.get_is_available is None:
+        return True
+    try:
+        return bool(description.get_is_available(entity))
+    except Exception:  # noqa: BLE001 - missing data means "not reported"
+        return False
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -42,7 +53,7 @@ async def async_setup_entry(
                 )
             )
 
-    async_add_entities(ariston_sensors)
+    async_add_entities([sensor for sensor in ariston_sensors if _should_add(sensor)])
 
 
 class AristonSensor(AristonEntity, SensorEntity):

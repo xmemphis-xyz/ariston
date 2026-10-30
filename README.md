@@ -20,15 +20,20 @@ GALEVO devices also expose:
 - **anti-legionella enabled / temperature / frequency** (diagnostic)
 - **CH flow-return delta** — flow temperature minus return temperature
 
-Entities whose value the cloud does not report for your device are shown as
-unavailable.
+Entities whose value the cloud does not report for your device are not
+created.
 
-## Diagnostics
+## Technical-menu scan and diagnostics
 
-Device page → ⋮ → **Download diagnostics** saves the polled data and a scan of
-technical-menu items 1–500. Credentials, gateway, serial number and names are
-redacted. The scan takes about ten cloud requests, so download it occasionally
-rather than on a schedule.
+To find further heat-pump operating parameters, run the service
+**Ariston Nimbus: Scan technical menu** (`ariston_nimbus.scan_menu_items`) from
+Developer tools → Actions. It scans menu items 1–500 in the background (a few
+minutes), shows a notification when finished and saves the result to
+`ariston_nimbus_menu_scan.json` in the config folder.
+
+Device page → ⋮ → **Download diagnostics** saves the polled data together with
+the latest scan result. Credentials, gateway, serial number and names are
+redacted.
 
 ## Daily energy statistics
 

@@ -715,7 +715,7 @@ class AristonAPI:
     ) -> list[dict[str, Any]]:
         """Async get arbitrary menu items (used for diagnostics)."""
         ids = ",".join(str(int(item_id)) for item_id in menu_item_ids)
-        items = await self._async_get(
+        items = await self._async_get_no_retry(
             f"{self.__api_url}{ARISTON_MENU_ITEMS}/{gw_id}?menuItems={ids}"
         )
         if isinstance(items, list):
@@ -992,8 +992,13 @@ class AristonAPI:
         body: Any = None,
         is_retry: bool = False,
         retry_count: int = 0,
+        retry_errors: bool = True,
     ) -> Optional[dict[str, Any]]:
-        """Async request with aiohttp"""
+        """Async request with aiohttp.
+
+        ``retry_errors=False`` makes server/client errors fail immediately
+        (no backoff, no error log); used for probing optional data.
+        """
         headers: dict[str, Any] = {
             "User-Agent": self.__user_agent,
             "ar.authToken": self.__token,
@@ -1019,7 +1024,12 @@ class AristonAPI:
                         if not is_retry:
                             if await self.async_connect():
                                 return await self.__async_request(
-                                    method, path, params, body, True
+                                    method,
+                                    path,
+                                    params,
+                                    body,
+                                    True,
+                                    retry_errors=retry_errors,
                                 )
                             raise ConnectionException(
                                 "Login failed (password changed?)"
@@ -1043,9 +1053,22 @@ class AristonAPI:
                         )
                         await asyncio.sleep(wait_seconds)
                         return await self.__async_request(
-                            method, path, params, body, is_retry, retry_count + 1
+                            method,
+                            path,
+                            params,
+                            body,
+                            is_retry,
+                            retry_count + 1,
+                            retry_errors,
                         )
                     case _ if response.status >= 500:
+                        if not retry_errors:
+                            _LOGGER.debug(
+                                "Ariston cloud returned %s for %s (no retry)",
+                                response.status,
+                                path,
+                            )
+                            raise ConnectionException(response.status)
                         if retry_count >= self.__max_retries:
                             try:
                                 content = await response.text()
@@ -1075,7 +1098,7 @@ class AristonAPI:
                             method, path, params, body, is_retry, retry_count + 1
                         )
                     case _:
-                        if not is_retry:
+                        if not is_retry and retry_errors:
                             await asyncio.sleep(5)
                             return await self.__async_request(
                                 method, path, params, body, True
@@ -1098,3 +1121,7 @@ class AristonAPI:
     ) -> Any:
         """Async GET request"""
         return await self.__async_request("GET", path, params, None)
+
+    async def _async_get_no_retry(self, path: str) -> Any:
+        """Async GET request that fails fast on HTTP errors"""
+        return await self.__async_request("GET", path, None, None, retry_errors=False)

@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.13
+
+- Fix Download diagnostics hanging: the technical-menu scan no longer runs during
+  the download. The Ariston cloud rejects requests containing unknown ids with
+  HTTP 500, and retrying every batch with backoff took several minutes.
+- New `ariston_nimbus.scan_menu_items` service runs the scan in the background
+  (fail-fast requests, falls back to single ids for rejected batches, capped
+  requests and run time). The result appears as a notification, is saved to
+  `ariston_nimbus_menu_scan.json` in the config folder and is included in
+  Download diagnostics.
+- Operating entities added in 0.1.12 are no longer created when the cloud does
+  not report their value for the device.
+- Log an unknown weather code only once instead of on every update.
+- Fix the device picker of the `create_vacation` and `set_item_by_id` services
+  (it pointed at the original `ariston` integration).
+
 ## 0.1.12
 
 - Add Home Assistant diagnostics (device page → Download diagnostics). Besides the

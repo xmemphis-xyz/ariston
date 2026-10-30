@@ -22,6 +22,17 @@ from .const import (
 from .coordinator import DeviceDataUpdateCoordinator
 from .entity import AristonEntity
 
+
+def _should_add(entity) -> bool:
+    """Skip entities whose value the cloud never reports for this device."""
+    description = entity.entity_description
+    if not description.skip_if_unavailable or description.get_is_available is None:
+        return True
+    try:
+        return bool(description.get_is_available(entity))
+    except Exception:  # noqa: BLE001 - missing data means "not reported"
+        return False
+
 _LOGGER = logging.getLogger(__name__)
 
 SERVICE_CREATE_VACATION = "create_vacation"
@@ -63,6 +74,9 @@ async def async_setup_entry(
                     AristonBinarySensor(coordinator, description)
                 )
 
+    ariston_binary_sensors = [
+        sensor for sensor in ariston_binary_sensors if _should_add(sensor)
+    ]
     async_add_entities(ariston_binary_sensors)
 
     if coordinator.device.system_type == SystemType.GALEVO:
