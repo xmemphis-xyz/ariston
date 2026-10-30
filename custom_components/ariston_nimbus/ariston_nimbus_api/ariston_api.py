@@ -710,6 +710,18 @@ class AristonAPI:
             return med_plant_settings
         return dict()
 
+    async def async_get_menu_items_by_ids(
+        self, gw_id: str, menu_item_ids: list[int]
+    ) -> list[dict[str, Any]]:
+        """Async get arbitrary menu items (used for diagnostics)."""
+        ids = ",".join(str(int(item_id)) for item_id in menu_item_ids)
+        items = await self._async_get(
+            f"{self.__api_url}{ARISTON_MENU_ITEMS}/{gw_id}?menuItems={ids}"
+        )
+        if isinstance(items, list):
+            return items
+        return list()
+
     async def async_get_menu_items(self, gw_id: str) -> list[dict[str, Any]]:
         """Async get menu items"""
         items = await self._async_get(

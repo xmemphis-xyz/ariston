@@ -530,6 +530,68 @@ class AristonGalevoDevice(AristonDevice):
         return self._get_item_by_id(DeviceProperties.IS_FLAME_ON, PropertyType.VALUE)
 
     @property
+    def has_flame_on_value(self) -> bool:
+        """Return whether the cloud reports the heat-generator status"""
+        return self.is_flame_on_value is not None
+
+    def has_zone_heat_request(self, zone_number: int) -> bool:
+        """Return whether the cloud reports a heat request for a zone"""
+        return self.get_zone_heat_request_value(zone_number) is not None
+
+    @property
+    def antilegionella_on_off_value(self) -> Optional[bool]:
+        """Get anti-legionella function on/off value"""
+        value = self._get_item_by_id(
+            DeviceProperties.ANTILEGIONELLA_ON_OFF, PropertyType.VALUE
+        )
+        return None if value is None else bool(value)
+
+    @property
+    def antilegionella_temp_value(self) -> Optional[float]:
+        """Get anti-legionella target temperature"""
+        return self._get_item_by_id(
+            DeviceProperties.ANTILEGIONELLA_TEMP, PropertyType.VALUE
+        )
+
+    @property
+    def antilegionella_temp_unit(self) -> Optional[str]:
+        """Get anti-legionella temperature unit"""
+        return self._get_item_by_id(
+            DeviceProperties.ANTILEGIONELLA_TEMP, PropertyType.UNIT
+        )
+
+    @property
+    def antilegionella_freq_value(self) -> Optional[str]:
+        """Get anti-legionella frequency as text when the cloud provides it"""
+        value = self._get_item_by_id(
+            DeviceProperties.ANTILEGIONELLA_FREQ, PropertyType.VALUE
+        )
+        if value is None:
+            return None
+        options = self._get_item_by_id(
+            DeviceProperties.ANTILEGIONELLA_FREQ, PropertyType.OPTIONS
+        )
+        texts = self._get_item_by_id(
+            DeviceProperties.ANTILEGIONELLA_FREQ, PropertyType.OPT_TEXTS
+        )
+        if isinstance(options, list) and isinstance(texts, list):
+            try:
+                return str(texts[options.index(value)])
+            except (ValueError, IndexError):
+                pass
+        return str(value)
+
+    @property
+    def ch_flow_return_delta_value(self) -> Optional[float]:
+        """Difference between CH flow and CH return temperature"""
+        try:
+            flow = float(self.ch_flow_temp_value)
+            ret = float(self.ch_return_temp_value)
+        except (TypeError, ValueError):
+            return None
+        return round(flow - ret, 1)
+
+    @property
     def is_heating_pump_on_value(self) -> bool:
         """Get is heating pump on value"""
         return self._get_item_by_id(

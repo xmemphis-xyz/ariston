@@ -10,6 +10,26 @@ Adds the DHW Boost switch and other entities from the GALEVO heat-pump changes i
 
 The Python API dependency is pinned to the tested companion branch commit until the upstream changes are released.
 
+## Operating parameters
+
+GALEVO devices also expose:
+
+- **heat generator on** — the cloud's `IsFlameOn` status (on heat pumps it
+  indicates the heat generator is running)
+- **zone heat request** — one binary sensor per zone
+- **anti-legionella enabled / temperature / frequency** (diagnostic)
+- **CH flow-return delta** — flow temperature minus return temperature
+
+Entities whose value the cloud does not report for your device are shown as
+unavailable.
+
+## Diagnostics
+
+Device page → ⋮ → **Download diagnostics** saves the polled data and a scan of
+technical-menu items 1–500. Credentials, gateway, serial number and names are
+redacted. The scan takes about ten cloud requests, so download it occasionally
+rather than on a schedule.
+
 ## Daily energy statistics
 
 For metered Ariston devices, two additional sensors report the energy used since

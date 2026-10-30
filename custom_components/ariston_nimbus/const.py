@@ -319,6 +319,45 @@ ARISTON_SENSOR_TYPES: list[AristonSensorEntityDescription] = [
         system_types=[SystemType.GALEVO],
     ),
     AristonSensorEntityDescription(
+        key="ChFlowReturnDelta",
+        name=f"{NAME} CH flow-return delta",
+        icon="mdi:thermometer-lines",
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
+        get_native_value=lambda entity: entity.device.ch_flow_return_delta_value,
+        get_native_unit_of_measurement=lambda entity: entity.device.ch_flow_temp_unit,
+        get_is_available=lambda entity: (
+            entity.device.ch_flow_return_delta_value is not None
+        ),
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonSensorEntityDescription(
+        key=DeviceProperties.ANTILEGIONELLA_TEMP,
+        name=f"{NAME} anti-legionella temperature",
+        icon="mdi:bacteria-outline",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        get_native_value=lambda entity: entity.device.antilegionella_temp_value,
+        get_native_unit_of_measurement=lambda entity: (
+            entity.device.antilegionella_temp_unit
+        ),
+        get_is_available=lambda entity: (
+            entity.device.antilegionella_temp_value is not None
+        ),
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonSensorEntityDescription(
+        key=DeviceProperties.ANTILEGIONELLA_FREQ,
+        name=f"{NAME} anti-legionella frequency",
+        icon="mdi:calendar-refresh",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        get_native_value=lambda entity: entity.device.antilegionella_freq_value,
+        get_is_available=lambda entity: (
+            entity.device.antilegionella_freq_value is not None
+        ),
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonSensorEntityDescription(
         key=DeviceProperties.OUTSIDE_TEMP,
         name=f"{NAME} Outside temp",
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -528,6 +567,38 @@ ARISTON_BINARY_SENSOR_TYPES: list[AristonBinarySensorEntityDescription] = [
         icon="mdi:radiator",
         get_is_on=lambda entity: entity.device.is_resistor_on_value,
         device_features=[DeviceFeatures.HP_SYS],
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonBinarySensorEntityDescription(
+        key=DeviceProperties.IS_FLAME_ON,
+        name=f"{NAME} heat generator on",
+        icon="mdi:heat-wave",
+        get_is_on=lambda entity: bool(entity.device.is_flame_on_value),
+        get_is_available=lambda entity: entity.device.has_flame_on_value,
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonBinarySensorEntityDescription(
+        key=ThermostatProperties.ZONE_HEAT_REQUEST,
+        name=f"{NAME} zone heat request",
+        icon="mdi:home-thermometer",
+        zone=True,
+        get_is_on=lambda entity: bool(
+            entity.device.get_zone_heat_request_value(entity.zone)
+        ),
+        get_is_available=lambda entity: entity.device.has_zone_heat_request(
+            entity.zone
+        ),
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonBinarySensorEntityDescription(
+        key=DeviceProperties.ANTILEGIONELLA_ON_OFF,
+        name=f"{NAME} anti-legionella enabled",
+        icon="mdi:bacteria-outline",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        get_is_on=lambda entity: bool(entity.device.antilegionella_on_off_value),
+        get_is_available=lambda entity: (
+            entity.device.antilegionella_on_off_value is not None
+        ),
         system_types=[SystemType.GALEVO],
     ),
     AristonBinarySensorEntityDescription(

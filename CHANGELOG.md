@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.12
+
+- Add Home Assistant diagnostics (device page → Download diagnostics). Besides the
+  data already polled, it scans technical-menu items 1–500 so further heat-pump
+  operating parameters can be identified and added as sensors.
+- Add GALEVO operating entities: heat generator on, per-zone heat request,
+  anti-legionella enabled / temperature / frequency, and the CH flow–return
+  temperature difference.
+- New entities stay unavailable when the Ariston cloud does not report the
+  underlying value; existing entity IDs are unchanged.
+
 ## 0.1.11
 
 - Fix the daily heating and hot-water energy totals: the 24 readings in Ariston's
