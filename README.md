@@ -20,6 +20,14 @@ GALEVO devices also expose:
 - **anti-legionella enabled / temperature / frequency** (diagnostic)
 - **CH flow-return delta** — flow temperature minus return temperature
 
+From the technical menu (verified on a Nimbus Compact S NET R32):
+
+- **heat pump mode** — Heating, Standby, Defrost, Freeze protection, …
+- **heat pump outside air temp**, **heat pump water flow temp**,
+  **CH flow temperature**
+- **zone humidity N** — only for zones with a humidity sensor
+- **CH backup resistance**, **HV input 1**
+
 Entities whose value the cloud does not report for your device are not
 created.
 

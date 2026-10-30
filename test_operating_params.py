@@ -15,7 +15,7 @@ sys.path.insert(
     0, str(Path(__file__).resolve().parent / "custom_components" / "ariston_nimbus")
 )
 
-from ariston_nimbus_api.ariston_api import AristonAPI  # noqa: E402
+from ariston_nimbus_api.ariston_api import AristonAPI, ConnectionException  # noqa: E402
 from ariston_nimbus_api.galevo_device import AristonGalevoDevice  # noqa: E402
 from runpy import run_path  # noqa: E402
 
@@ -114,6 +114,71 @@ class MenuScanTests(unittest.TestCase):
         api._async_get_no_retry = fake_get
         self.assertEqual(asyncio.run(api.async_get_menu_items_by_ids("GW1", [1])), [])
 
+
+
+HP_MODE_ITEM = {
+    "id": 340,
+    "value": 9.0,
+    "options": {"1": "Standby", "3": "Heating", "9": "Defrost"},
+}
+
+
+class MenuItemValueTests(unittest.TestCase):
+    """Operating parameters read from the polled technical menu."""
+
+    def test_enum_text(self):
+        device = _device([], [HP_MODE_ITEM])
+        self.assertEqual(device.get_menu_item_text(340), "Defrost")
+
+    def test_numeric_value_and_missing(self):
+        device = _device([], [{"id": 348, "value": 26.0}, {"id": 1, "error": True, "value": 5}])
+        self.assertEqual(device.get_menu_item_value(348), 26.0)
+        self.assertIsNone(device.get_menu_item_value(349))
+        self.assertIsNone(device.get_menu_item_value(1))
+        self.assertTrue(device.has_menu_item(348))
+        self.assertFalse(device.has_menu_item(124))
+
+    def test_room_sensor(self):
+        device = _device([])
+        device.features = {"zones": [{"num": 1, "roomSens": False}, {"num": 2, "roomSens": True}]}
+        self.assertFalse(device.zone_has_room_sensor(1))
+        self.assertTrue(device.zone_has_room_sensor(2))
+
+
+class MenuPollingFallbackTests(unittest.TestCase):
+    """A rejected extended menu request falls back to the basic items."""
+
+    def _api(self):
+        api = AristonAPI.__new__(AristonAPI)
+        api._AristonAPI__api_url = "https://example/api/v2/"
+        api._AristonAPI__menu_fallback_logged = False
+        return api
+
+    def test_extended_ok(self):
+        api = self._api()
+
+        async def no_retry(path):
+            return [{"id": 340, "value": 3}]
+
+        api._async_get_no_retry = no_retry
+        self.assertEqual(asyncio.run(api.async_get_menu_items("GW"))[0]["id"], 340)
+
+    def test_fallback_to_basic(self):
+        api = self._api()
+        calls = []
+
+        async def no_retry(path):
+            raise ConnectionException(500)
+
+        async def retrying(path, params=None):
+            calls.append(path)
+            return [{"id": 119, "value": 90}]
+
+        api._async_get_no_retry = no_retry
+        api._async_get = retrying
+        items = asyncio.run(api.async_get_menu_items("GW"))
+        self.assertEqual(items, [{"id": 119, "value": 90}])
+        self.assertTrue(calls[0].endswith("menuItems=119,124"))
 
 
 class FakeMenuApi:

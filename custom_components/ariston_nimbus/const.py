@@ -34,7 +34,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.components.switch import SwitchEntityDescription
-from homeassistant.const import UnitOfEnergy, UnitOfTemperature, UnitOfTime
+from homeassistant.const import PERCENTAGE, UnitOfEnergy, UnitOfTemperature, UnitOfTime
 from homeassistant.helpers.entity import EntityCategory, EntityDescription
 from homeassistant.util import dt as dt_util
 
@@ -316,11 +316,96 @@ ARISTON_SENSOR_TYPES: list[AristonSensorEntityDescription] = [
     ),
     AristonSensorEntityDescription(
         key=str(MenuItemNames.CH_RETURN_TEMP),
+        skip_if_unavailable=True,
+        get_is_available=lambda entity: entity.device.has_menu_item(
+            MenuItemNames.CH_RETURN_TEMP
+        ),
         name=f"{NAME} CH return temp",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
         get_native_value=lambda entity: entity.device.ch_return_temp_value,
         get_native_unit_of_measurement=lambda entity: entity.device.ch_return_temp_unit,
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonSensorEntityDescription(
+        key=str(MenuItemNames.HEAT_PUMP_MODE),
+        name=f"{NAME} heat pump mode",
+        icon="mdi:heat-pump",
+        skip_if_unavailable=True,
+        get_is_available=lambda entity: entity.device.has_menu_item(
+            MenuItemNames.HEAT_PUMP_MODE
+        ),
+        get_native_value=lambda entity: entity.device.get_menu_item_text(
+            MenuItemNames.HEAT_PUMP_MODE
+        ),
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonSensorEntityDescription(
+        key=str(MenuItemNames.HP_OUTSIDE_AIR_TEMP),
+        name=f"{NAME} heat pump outside air temp",
+        icon="mdi:thermometer",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        skip_if_unavailable=True,
+        get_is_available=lambda entity: entity.device.has_menu_item(
+            MenuItemNames.HP_OUTSIDE_AIR_TEMP
+        ),
+        get_native_value=lambda entity: entity.device.get_menu_item_value(
+            MenuItemNames.HP_OUTSIDE_AIR_TEMP
+        ),
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonSensorEntityDescription(
+        key=str(MenuItemNames.HP_WATER_FLOW_TEMP),
+        name=f"{NAME} heat pump water flow temp",
+        icon="mdi:thermometer-water",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        skip_if_unavailable=True,
+        get_is_available=lambda entity: entity.device.has_menu_item(
+            MenuItemNames.HP_WATER_FLOW_TEMP
+        ),
+        get_native_value=lambda entity: entity.device.get_menu_item_value(
+            MenuItemNames.HP_WATER_FLOW_TEMP
+        ),
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonSensorEntityDescription(
+        key=str(MenuItemNames.CH_FLOW_TEMP_MENU),
+        name=f"{NAME} CH flow temperature",
+        icon="mdi:thermometer-chevron-up",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        skip_if_unavailable=True,
+        get_is_available=lambda entity: entity.device.has_menu_item(
+            MenuItemNames.CH_FLOW_TEMP_MENU
+        ),
+        get_native_value=lambda entity: entity.device.get_menu_item_value(
+            MenuItemNames.CH_FLOW_TEMP_MENU
+        ),
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonSensorEntityDescription(
+        key="ZoneHumidity",
+        name=f"{NAME} zone humidity",
+        icon="mdi:water-percent",
+        zone=True,
+        device_class=SensorDeviceClass.HUMIDITY,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        skip_if_unavailable=True,
+        # Zones without a humidity sensor report 0 %.
+        get_is_available=lambda entity: bool(
+            entity.device.get_menu_item_value(
+                MenuItemNames.ZONE_1_HUMIDITY + entity.zone - 1
+            )
+        ),
+        get_native_value=lambda entity: entity.device.get_menu_item_value(
+            MenuItemNames.ZONE_1_HUMIDITY + entity.zone - 1
+        ),
         system_types=[SystemType.GALEVO],
     ),
     AristonSensorEntityDescription(
@@ -609,6 +694,33 @@ ARISTON_BINARY_SENSOR_TYPES: list[AristonBinarySensorEntityDescription] = [
         get_is_on=lambda entity: bool(entity.device.antilegionella_on_off_value),
         get_is_available=lambda entity: (
             entity.device.antilegionella_on_off_value is not None
+        ),
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonBinarySensorEntityDescription(
+        key=str(MenuItemNames.CH_BACKUP_RESISTANCE_1),
+        name=f"{NAME} CH backup resistance",
+        icon="mdi:radiator",
+        skip_if_unavailable=True,
+        get_is_available=lambda entity: entity.device.has_menu_item(
+            MenuItemNames.CH_BACKUP_RESISTANCE_1
+        ),
+        get_is_on=lambda entity: bool(
+            entity.device.get_menu_item_value(MenuItemNames.CH_BACKUP_RESISTANCE_1)
+        ),
+        system_types=[SystemType.GALEVO],
+    ),
+    AristonBinarySensorEntityDescription(
+        key=str(MenuItemNames.HV_INPUT_1_STATE),
+        name=f"{NAME} HV input 1",
+        icon="mdi:electric-switch",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        skip_if_unavailable=True,
+        get_is_available=lambda entity: entity.device.has_menu_item(
+            MenuItemNames.HV_INPUT_1_STATE
+        ),
+        get_is_on=lambda entity: bool(
+            entity.device.get_menu_item_value(MenuItemNames.HV_INPUT_1_STATE)
         ),
         system_types=[SystemType.GALEVO],
     ),

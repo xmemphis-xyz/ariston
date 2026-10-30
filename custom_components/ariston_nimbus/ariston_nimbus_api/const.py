@@ -652,6 +652,24 @@ class MenuItemNames(IntEnum):
 
     CH_RETURN_TEMP = 124
     SIGNAL_STRENGTH = 119
+    # GALEVO heat-pump operating parameters (found with the menu scan on a
+    # Nimbus Compact S NET R32; other models may not report all of them).
+    ZONE_1_HUMIDITY = 146
+    ZONE_2_HUMIDITY = 147
+    ZONE_3_HUMIDITY = 148
+    HV_INPUT_1_STATE = 304
+    CH_BACKUP_RESISTANCE_1 = 337
+    HEAT_PUMP_MODE = 340
+    HP_OUTSIDE_AIR_TEMP = 341
+    HP_WATER_FLOW_TEMP = 348
+    CH_FLOW_TEMP_MENU = 349
+
+    @classmethod
+    def base_values(cls) -> str:
+        """Menu items every GALEVO device is expected to support"""
+        return ",".join(
+            str(c.value) for c in (cls.SIGNAL_STRENGTH, cls.CH_RETURN_TEMP)
+        )
 
     @classmethod
     def values(cls) -> str:

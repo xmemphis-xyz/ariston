@@ -62,6 +62,7 @@ class AristonAPI:
         self.__token = ""
         self.__user_agent = user_agent
         self.__max_retries = max_retries
+        self.__menu_fallback_logged = False
 
     @staticmethod
     def __retry_after_seconds(header_value: Optional[str], retry_count: int) -> float:
@@ -723,9 +724,28 @@ class AristonAPI:
         return list()
 
     async def async_get_menu_items(self, gw_id: str) -> list[dict[str, Any]]:
-        """Async get menu items"""
+        """Async get menu items.
+
+        The extended list (operating parameters) is requested without retries;
+        if the cloud rejects it, fall back to the basic items so signal
+        strength keeps working on devices that lack some parameters.
+        """
+        try:
+            items = await self._async_get_no_retry(
+                f"{self.__api_url}{ARISTON_MENU_ITEMS}/{gw_id}?menuItems={MenuItemNames.values()}"
+            )
+            if isinstance(items, list):
+                return items
+        except ConnectionException as err:
+            if not self.__menu_fallback_logged:
+                self.__menu_fallback_logged = True
+                _LOGGER.warning(
+                    "Ariston cloud rejected the extended menu items (%s); "
+                    "using the basic items only",
+                    err,
+                )
         items = await self._async_get(
-            f"{self.__api_url}{ARISTON_MENU_ITEMS}/{gw_id}?menuItems={MenuItemNames.values()}"
+            f"{self.__api_url}{ARISTON_MENU_ITEMS}/{gw_id}?menuItems={MenuItemNames.base_values()}"
         )
         if items is not None:
             return items

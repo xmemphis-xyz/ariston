@@ -850,6 +850,45 @@ class AristonGalevoDevice(AristonDevice):
             default,
         )
 
+    def get_menu_item_value(self, menu_item_id: int) -> Optional[float]:
+        """Numeric value of a polled technical-menu item (None if missing)"""
+        item = next(
+            (i for i in self.menu_items if i.get("id") == int(menu_item_id)), None
+        )
+        if item is None or item.get("error"):
+            return None
+        value = item.get("value")
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    def get_menu_item_text(self, menu_item_id: int) -> Optional[str]:
+        """Text of an enum technical-menu item, e.g. heat-pump mode"""
+        item = next(
+            (i for i in self.menu_items if i.get("id") == int(menu_item_id)), None
+        )
+        value = self.get_menu_item_value(menu_item_id)
+        if item is None or value is None:
+            return None
+        options = item.get("options")
+        if isinstance(options, dict):
+            text = options.get(str(int(value)))
+            if text is not None:
+                return str(text)
+        return str(int(value))
+
+    def has_menu_item(self, menu_item_id: int) -> bool:
+        """Whether the cloud returned a value for this menu item"""
+        return self.get_menu_item_value(menu_item_id) is not None
+
+    def zone_has_room_sensor(self, zone: int) -> bool:
+        """Whether the zone has a room temperature sensor"""
+        for zone_info in self.zones or []:
+            if zone_info.get(ZoneAttribute.NUM) == zone:
+                return bool(zone_info.get(ZoneAttribute.ROOM_SENS, False))
+        return False
+
     def _get_menu_item_by_id(self, menu_item_id: int, item_value: str) -> Any:
         """Get item attribute from data"""
         return next(

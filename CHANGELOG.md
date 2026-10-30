@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.14
+
+- Add heat-pump operating sensors read from the technical menu (found with the
+  menu scan on a Nimbus Compact S NET R32): heat pump mode (Heating, Standby,
+  Defrost, Freeze protection, …), heat pump outside air temperature, heat pump
+  water flow temperature, CH flow temperature, zone humidity, CH backup
+  resistance and HV input 1.
+- Poll the extended menu items without retries and fall back to the basic items
+  (signal strength) if the cloud rejects them, so other models keep working.
+- Do not create the CH return temperature sensor when the device does not report
+  it, nor humidity sensors for zones without a humidity sensor.
+- Climate entities show an unknown current temperature instead of 0 °C for zones
+  without a room sensor.
+- Diagnostics now also redact the plant address and coordinates.
+
 ## 0.1.13
 
 - Fix Download diagnostics hanging: the technical-menu scan no longer runs during

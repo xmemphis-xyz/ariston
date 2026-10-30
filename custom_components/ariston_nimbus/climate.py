@@ -110,9 +110,19 @@ class AristonThermostat(AristonEntity, ClimateEntity):
         return self.device.get_target_temp_step(self.zone)
 
     @property
-    def current_temperature(self) -> float:
-        """Return the reported current temperature for the device."""
-        return self.device.get_measured_temp_value(self.zone)
+    def current_temperature(self) -> float | None:
+        """Return the reported current temperature for the device.
+
+        Zones without a room sensor report 0 °C; show "unknown" instead.
+        """
+        value = self.device.get_measured_temp_value(self.zone)
+        if (
+            value == 0
+            and hasattr(self.device, "zone_has_room_sensor")
+            and not self.device.zone_has_room_sensor(self.zone)
+        ):
+            return None
+        return value
 
     @property
     def target_temperature(self) -> float:
